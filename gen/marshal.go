@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/tinylib/msgp/msgp"
+	"github.com/jsnathan/msgp/msgp"
 )
 
 func marshal(w io.Writer) *marshalGen {
