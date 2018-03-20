@@ -457,9 +457,13 @@ func (fs *FileSet) parseExpr(e ast.Expr) gen.Elem {
 	switch e := e.(type) {
 
 	case *ast.MapType:
-		if k, ok := e.Key.(*ast.Ident); ok && k.Name == "string" {
+		if k, ok := e.Key.(*ast.Ident); ok {
 			if in := fs.parseExpr(e.Value); in != nil {
-				return &gen.Map{Value: in}
+				primitiveKeyType := k.String()
+				switch primitiveKeyType {
+				case "string", "int16", "int32", "int64", "uint16", "uint32", "uint64":
+					return &gen.Map{Value: in, Type: primitiveKeyType}
+				}
 			}
 		}
 		return nil

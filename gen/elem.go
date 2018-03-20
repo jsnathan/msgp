@@ -234,7 +234,9 @@ func (a *Array) Complexity() int { return 1 + a.Els.Complexity() }
 type Map struct {
 	common
 	Keyidx string // key variable name
+	Keytmp string // tmp key variable name
 	Validx string // value variable name
+	Type   string // primitive key type
 	Value  Elem   // value element
 }
 
@@ -242,6 +244,7 @@ func (m *Map) SetVarname(s string) {
 	m.common.SetVarname(s)
 ridx:
 	m.Keyidx = randIdent()
+	m.Keytmp = randIdent()
 	m.Validx = randIdent()
 
 	// just in case
@@ -256,7 +259,7 @@ func (m *Map) TypeName() string {
 	if m.common.alias != "" {
 		return m.common.alias
 	}
-	m.common.Alias("map[string]" + m.Value.TypeName())
+	m.common.Alias("map[" + m.Type + "]" + m.Value.TypeName())
 	return m.common.alias
 }
 

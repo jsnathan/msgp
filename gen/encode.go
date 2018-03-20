@@ -132,7 +132,12 @@ func (e *encodeGen) gMap(m *Map) {
 	e.writeAndCheck(mapHeader, lenAsUint32, vname)
 
 	e.p.printf("\nfor %s, %s := range %s {", m.Keyidx, m.Validx, vname)
-	e.writeAndCheck(stringTyp, literalFmt, m.Keyidx)
+	if m.Type == "string" {
+		e.writeAndCheck(stringTyp, literalFmt, m.Keyidx)
+	} else {
+		e.p.encodeBinary(m.Type, m.Keyidx, m.Keytmp)
+		e.writeAndCheck(stringTyp, literalFmt, m.Keytmp)
+	}
 	next(e, m.Value)
 	e.p.closeblock()
 }

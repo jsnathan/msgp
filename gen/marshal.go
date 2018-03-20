@@ -129,6 +129,14 @@ func (m *marshalGen) rawbytes(bts []byte) {
 	m.p.print(")")
 }
 
+/*
+	o = append(o, 0xa9, 0x43, 0x6f, 0x6e, 0x6e, 0x65, 0x63, 0x74, 0x65, 0x64)
+	o = msgp.AppendMapHeader(o, uint32(len(z.Connected)))
+	for za0002, za0004 := range z.Connected {
+		o = msgp.AppendString(o, za0002)
+		o = msgp.AppendUint8(o, za0004)
+	}
+*/
 func (m *marshalGen) gMap(s *Map) {
 	if !m.p.ok() {
 		return
@@ -137,7 +145,12 @@ func (m *marshalGen) gMap(s *Map) {
 	vname := s.Varname()
 	m.rawAppend(mapHeader, lenAsUint32, vname)
 	m.p.printf("\nfor %s, %s := range %s {", s.Keyidx, s.Validx, vname)
-	m.rawAppend(stringTyp, literalFmt, s.Keyidx)
+	if s.Type == "string" {
+		m.rawAppend(stringTyp, literalFmt, s.Keyidx)
+	} else {
+		m.p.encodeBinary(s.Type, s.Keyidx, s.Keytmp)
+		m.rawAppend(stringTyp, literalFmt, s.Keytmp)
+	}
 	next(m, s.Value)
 	m.p.closeblock()
 }

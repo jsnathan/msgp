@@ -3,6 +3,7 @@ package gen
 import (
 	"fmt"
 	"io"
+	"strings"
 )
 
 const (
@@ -380,4 +381,24 @@ func (p *printer) ok() bool { return p.err == nil }
 
 func tobaseConvert(b *BaseElem) string {
 	return b.ToBase() + "(" + b.Varname() + ")"
+}
+
+func (p *printer) encodeBinary(typ string, num string, bin string) {
+	if !p.ok() {
+		return
+	}
+	method := "Put" + strings.Title(typ)
+	p.printf("\nvar byteBuf = make([]byte, 8)")
+	p.printf("\nbinary.LittleEndian.%s(byteBuf, %s)", method, num)
+	p.printf("\n%s := string(byteBuf)", bin)
+}
+
+func (p *printer) decodeBinary(num string, bin string, typ string) {
+	if !p.ok() {
+		return
+	}
+	method := strings.Title(typ)
+	p.printf("\nvar byteBuf = make([]byte, 8)")
+	p.printf("\ncopy(byteBuf, %s)", bin)
+	p.printf("\n%s = binary.LittleEndian.%s(byteBuf)", num, method)
 }

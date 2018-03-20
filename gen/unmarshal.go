@@ -190,8 +190,15 @@ func (u *unmarshalGen) gMap(m *Map) {
 
 	// loop and get key,value
 	u.p.printf("\nfor %s > 0 {", sz)
-	u.p.printf("\nvar %s string; var %s %s; %s--", m.Keyidx, m.Validx, m.Value.TypeName(), sz)
-	u.assignAndCheck(m.Keyidx, stringTyp)
+	u.p.declare(m.Keyidx, m.Type)
+	u.p.printf("\nvar %s %s; %s--", m.Validx, m.Value.TypeName(), sz)
+	if m.Type == "string" {
+		u.assignAndCheck(m.Keyidx, stringTyp)
+	} else {
+		u.p.declare(m.Keytmp, "string")
+		u.assignAndCheck(m.Keytmp, stringTyp)
+		u.p.decodeBinary(m.Keyidx, m.Keytmp, m.Type)
+	}
 	next(u, m.Value)
 	u.p.mapAssign(m)
 	u.p.closeblock()
